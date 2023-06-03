@@ -39,7 +39,8 @@ class WeeklyReport():
         self.start_date = datetime.fromtimestamp(start_date)
         self.number_of_matches = self.__get_total_matches_played()
         self.matches_by_date = self.__get_matches_by_date()
-        self.graph = self.__get_graph()
+        self.games_played_graph = self.__get_games_played_graph()
+        self.total_time_played_graph = self.__get_total_time_played_graph()
 
     def __get_total_matches_played(self) -> int:
         """
@@ -78,12 +79,12 @@ class WeeklyReport():
 
             # if match_date not in matches_by_date:
             #     matches_by_date[match_date] = []
-
-            matches_by_date[match_date].append(match)
+            if match_date in matches_by_date:
+                matches_by_date[match_date].append(match)
 
         return matches_by_date
 
-    def __get_graph(self) -> fig.Figure:
+    def __get_games_played_graph(self) -> fig.Figure:
         """
         Return a graph of the number of matches played by summoner last week
 
@@ -98,7 +99,9 @@ class WeeklyReport():
         x = list(self.matches_by_date.keys())
         y = [len(matches) for matches in self.matches_by_date.values()]
 
-        plt.bar(x, y)
+        barplot = plt.bar(x, y)
+        plt.bar_label(barplot, labels=y, label_type='edge')
+        # plt.bar_label(barplot, labels=y, label_type='center')
 
         plt.title(f"Number of Games Played by {self.summoner.name} Last Week")
 
@@ -108,8 +111,34 @@ class WeeklyReport():
 
         return fig
 
-    def __total_time_played_graph(self) -> int:
-        pass
+    def __get_total_time_played_graph(self) -> fig.Figure:
+        """
+        Return a graph of the total time played by summoner last week
+
+        Args:
+            None
+
+        Return: 
+            A graph of the total time played by summoner last week
+        """
+        fig = plt.figure()
+
+        x = list(self.matches_by_date.keys())
+        # y is the duration of match played on that day in minutes, cannot use sum() because it is a timedelta object
+        y = [sum([match.duration.total_seconds() for match in matches]
+                 ) / 60 for matches in self.matches_by_date.values()]
+
+        y_labels = [f"{int(time / 60)}h {int(time % 60)}m" for time in y]
+
+        barplot = plt.bar(x, y)
+        plt.bar_label(barplot, labels=y_labels, label_type='edge')
+        # plt.bar_label(barplot, labels=y, label_type='center')
+
+        plt.title(f"Total Time Played by {self.summoner.name} Last Week")
+
+        plt.ylabel("Total Time Played (minutes)")
+
+        return fig
 
     def __str__(self) -> str:
         """

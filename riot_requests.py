@@ -32,6 +32,7 @@ def get_teams_info(participants: List, active: bool) -> List[Team]:
     Returns:
         teams (List[Team]): a list of teams in the match
     """
+
     if active:
         team0 = Team(100, [])
         team1 = Team(200, [])
@@ -177,7 +178,10 @@ def get_matches_by_match_id(match_id: str):
     # with open(filename, 'w') as f:
     #     json.dump(match_info['info']['participants'], f)
 
-    teams = get_teams_info(match_info['info']['participants'], False)
+    if match_info['info']['participants'] == []:
+        teams = []
+    else:
+        teams = get_teams_info(match_info['info']['participants'], False)
 
     match = PastMatch(game_start, game_end, game_duration, teams)
 

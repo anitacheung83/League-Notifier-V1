@@ -124,20 +124,25 @@ def run_discord_bot() -> None:
 
         await interaction.response.defer()
         weekly_report = responses.weekly_report(summoner_name)
-        graph = weekly_report.graph
+        games_played_graph = weekly_report.games_played_graph
         # Save graph as image
-        graph.savefig("graph.png")
+        games_played_graph.savefig("games_played_graph.png")
         # Send graph to user
+        total_time_played_graph = weekly_report.total_time_played_graph
+        total_time_played_graph.savefig("total_time_played_graph.png")
+
         try:
             await interaction.followup.send(f"Total Number of Games Played by {weekly_report.summoner.name} last Week: {weekly_report.number_of_matches}")
             for i, match in enumerate(weekly_report.matches):
                 await interaction.followup.send(f"Match {i + 1}\n" + str(match))
-            await interaction.followup.send(file=discord.File("graph.png"))
+            await interaction.followup.send(file=discord.File("games_played_graph.png"))
+            await interaction.followup.send(file=discord.File("total_time_played_graph.png"))
 
         except Exception as e:
             raise MessageNotSend(
                 "Message could not be send. Please try again later.")
         # Delete graph
-        os.remove("graph.png")
+        os.remove("games_played_graph.png")
+        os.remove("total_time_played_graph.png")
 
     client.run((str(TOKEN)))

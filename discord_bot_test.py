@@ -1,5 +1,7 @@
 from discord.ext import commands
 from dotenv import load_dotenv
+import responses
+import discord
 import os
 import pytest
 
@@ -7,6 +9,7 @@ TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 client = commands.Bot(command_prefix="!", intents=intents)
+expected_active_game = None
 
 
 @client.tree.command(name="active")
